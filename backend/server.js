@@ -35,6 +35,23 @@ app.post('/signUp',(req,res)=>{
     })
 })
 
+app.post('/signIn',(req,res)=>{
+    const sql = "SELECT * FROM users WHERE `name` = ? AND `pass` = ?";
+    connect.query(sql,[req.body.name,req.body.pass],(err,data)=>{
+        if(err){
+            return res.json({err: err.message});
+        }
+        if(data.length > 0){
+            return res.json({
+                message:"Success",
+                data: data[0]
+            });
+        }else{
+            return res.json("False")
+        }
+    })
+})
+
 app.listen(port,()=>{
     console.log("Server is running on "+port);
 })

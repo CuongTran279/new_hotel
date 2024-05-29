@@ -1,8 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Navbar } from '../../components';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
 
 const Header = () => {
+    const [users, setUser] = useState(null);
+    const navigate = useNavigate();
+    useEffect(() => {
+        const user = localStorage.getItem('authToken');
+        if (user) {
+            const parsedUserData = JSON.parse(user);
+            setUser(parsedUserData);
+        }
+    }, []);
+    const logOut = () => {
+        localStorage.clear();
+        navigate('/');
+        window.location.reload();
+    };
     return (
         <div className="h-[60px] w-screen flex items-center bg-white justify-between px-8 drop-shadow-lg">
             <div className="flex items-center justify-between gap-10">
@@ -14,37 +28,21 @@ const Header = () => {
                     />
                 </Link>
                 <Navbar />
-                
             </div>
 
             <div className="flex items-center gap-5">
-                    <div className="flex items-center gap-5">
-                        <Link to="/login">
-                        <Button
-                            text="Tạo tài khoản"
-                            textColor="text-[#5392f9]"
-                            outline="outline-[#5392f9]"
-                            hoverBg="hover:bg-[#5392f9]"
-                            hoverText="hover:text-white"
-                        /></Link>
-                        <Link to="/register">
-                        <Button
-                            text="Đăng nhập"
-                            textColor="text-[#ff567d]"
-                            outline="outline-[#ff567d]"
-                            hoverBg="hover:bg-[#ff567d]"
-                            hoverText="hover:text-white"
-                        />
-                        </Link>
-                    </div>
-                    {/* <div className="flex items-center gap-5 flex-row">
-                        <p>Xin chào : <span className='uppercase'>Tên người dùng</span></p>
+                {users ? (
+                    <div className="flex items-center gap-5 flex-row">
+                        <p>
+                            Xin chào : <span className="uppercase">{users.name}</span>
+                        </p>
                         <Button
                             text="Đăng xuất"
                             textColor="text-[#ff567d]"
                             outline="outline-[#ff567d]"
                             hoverBg="hover:bg-[#ff567d]"
                             hoverText="hover:text-white"
+                            onClick={logOut}
                         />
                         <svg
                             width="24px"
@@ -67,7 +65,29 @@ const Header = () => {
                                 ></path>{' '}
                             </g>
                         </svg>
-                    </div> */}
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-5">
+                        <Link to="/login">
+                            <Button
+                                text="Tạo tài khoản"
+                                textColor="text-[#5392f9]"
+                                outline="outline-[#5392f9]"
+                                hoverBg="hover:bg-[#5392f9]"
+                                hoverText="hover:text-white"
+                            />
+                        </Link>
+                        <Link to="/register">
+                            <Button
+                                text="Đăng nhập"
+                                textColor="text-[#ff567d]"
+                                outline="outline-[#ff567d]"
+                                hoverBg="hover:bg-[#ff567d]"
+                                hoverText="hover:text-white"
+                            />
+                        </Link>
+                    </div>
+                )}
             </div>
         </div>
     );
