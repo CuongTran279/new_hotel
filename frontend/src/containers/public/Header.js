@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Header = () => {
     const [users, setUser] = useState(null);
+    const userRole = parseInt(localStorage.getItem('role'), 10);
     const navigate = useNavigate();
     useEffect(() => {
         const user = localStorage.getItem('authToken');
@@ -44,6 +45,15 @@ const Header = () => {
                             hoverText="hover:text-white"
                             onClick={logOut}
                         />
+                        {userRole === 1 ? <Link to="/admin">
+                            <Button
+                                text="Truy cập admin"
+                                textColor="text-[#5392f9]"
+                                outline="outline-[#5392f9]"
+                                hoverBg="hover:bg-[#5392f9]"
+                                hoverText="hover:text-white"
+                            />
+                        </Link> : null }
                         <svg
                             width="24px"
                             height="24px"

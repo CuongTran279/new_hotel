@@ -5,12 +5,17 @@ import { Outlet } from "react-router-dom";
 const Home = () => {
   return (
     <div>
-      <div className="h-[60px]">
+      <header className="h-[60px]">
         <Header />
-      </div>
+      </header>
       <div className="w-screen h-full">
         <Outlet/>
       </div>
+      <footer className="bg-gray-900 h-fit flex flex-col justify-center">
+        <div className="text-white text-center my-10">
+          CopryRight @2024 Trần Đình Cường
+        </div>
+      </footer>
     </div>
   );
 };

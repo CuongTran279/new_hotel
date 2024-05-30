@@ -32,6 +32,7 @@ const Register = () => {
                             icon: 'success',
                         }).then(()=>{
                           localStorage.setItem('authToken',JSON.stringify(res.data.data));
+                          localStorage.setItem('role',JSON.stringify(res.data.data.role));
                         }).then(()=>{
                           navigate('/');
                           window.location.reload();
