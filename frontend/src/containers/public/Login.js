@@ -16,7 +16,7 @@ const Login = () => {
     });
     const navigate = useNavigate();
     const [invalidfield, setInvalidfield] = useState([]);
-    const handleSubmit = async (e) => {
+    const handleSubmit =(e) => {
         e.preventDefault();
         const validatiton = validate(payload);
         if (Object.keys(validatiton).length > 0) {
