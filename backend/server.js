@@ -29,6 +29,7 @@ app.get('/', (req, res) => {
     });
 });
 
+
 app.post('/signUp', (req, res) => {
     const sql = 'INSERT INTO users(email, name, pass, phone, address) VALUES (?)';
     const values = [req.body.email, req.body.name, req.body.pass, req.body.phone, req.body.address];
@@ -83,6 +84,17 @@ app.post('/addRoomType', (req, res) => {
 app.get('/roomType',(req,res)=>{
     const sql = 'SELECT rt.id,rt.name,rt.des,rt.price,rt.capicity, JSON_ARRAYAGG(img.path) AS img_paths FROM roomtype AS rt INNER JOIN img ON rt.id = img.roomId GROUP BY rt.id, rt.name, rt.des, rt.price, rt.capicity';
     connect.query(sql,(err,result)=>{
+        if(err){
+            return res.json({msg:"Lỗi"})
+        }
+        return res.json(result);
+    })
+})
+
+app.get('/getRoomType/:id',(req,res)=>{
+    const sql = 'SELECT * from roomtype where id= ? ';
+    const id = req.params.id;
+    connect.query(sql,[id],(err,result)=>{
         if(err){
             return res.json({msg:"Lỗi"})
         }

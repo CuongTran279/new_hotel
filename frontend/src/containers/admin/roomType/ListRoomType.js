@@ -40,21 +40,25 @@ const ListRoomType = () => {
                         </div>
 
                         <div className="bg-white ">
-                            <table className="min-w-full bg-white">
-                                <thead className="bg-gray-800 text-white">
+                            <table className="min-w-full bg-white ">
+                                <thead className="bg-gray-800 text-white text-center justify-center">
                                     <tr>
-                                        <th className="text-left py-3 px-4 uppercase font-semibold text-sm">ID</th>
-                                        <th className="text-left py-3 px-4 uppercase font-semibold text-sm">Name</th>
-                                        <th className="text-left py-3 px-4 uppercase font-semibold text-sm">IMG</th>
-                                        <th className="text-left py-3 px-4 uppercase font-semibold text-sm">
+                                        <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">ID</th>
+                                        <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">Name</th>
+                                        <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">IMG</th>
+                                        <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">
                                             Description
                                         </th>
-                                        <th className="text-left py-3 px-4 uppercase font-semibold text-sm">Price</th>
-                                        <th className="text-left py-3 px-4 uppercase font-semibold text-sm">
+                                        <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">Price</th>
+                                        <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">
                                             Capicity
+                                        </th>
+                                        <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">
+                                            Action
                                         </th>
                                     </tr>
                                 </thead>
+                                {payload.length !== 0 ? 
                                 <tbody className="text-gray-700">
                                     {payload.map((room, i) => {
                                         JSON.parse(room.img_paths).forEach((element) => {
@@ -76,10 +80,15 @@ const ListRoomType = () => {
                                                 <td className="text-left py-3 px-4">{room.des}</td>
                                                 <td className="text-left py-3 px-4">{room.price}</td>
                                                 <td className="text-left py-3 px-4">{room.capicity}</td>
+                                                <td className='grid grid-cols-2 gap-5'>
+                                                    <Link to={`../updateRoomType/${room.id}`}><button type="" className='p-2 outline-none bg-[#4183ec] text-white rounded-md hover:bg-[#5392f9]' >Edit</button></Link> 
+                                                    <Link><button type="" className='p-2 outline-none bg-[#c53456] text-white rounded-md hover:bg-[#ff567d]'>Delete</button></Link>
+                                                </td>
                                             </tr>
                                         );
                                     })}
                                 </tbody>
+                                : <h1 className='uppercase'> Chưa có bản ghi nào </h1> }
                             </table>
                         </div>
                     </div>
