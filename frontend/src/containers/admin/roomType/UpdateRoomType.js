@@ -18,10 +18,6 @@ const UpdateRoomType = () => {
         const { name, value } = e.target;
         setPayload({ ...payload, [name]: value });
     };
-    const inputFiles = (e) => {
-        const files = Array.from(e.target.files);
-        setPayload({ ...payload, img: files });
-    };
     const setInvalid = (e) => {
         const { name } = e.target;
         setInvalidfield({ ...invalidfield, [name]: undefined });
@@ -30,19 +26,10 @@ const UpdateRoomType = () => {
         axios
             .get(`http://localhost:5000/getRoomType/`+ id)
             .then((res) =>
-              // console.log(res.data)
-                setPayload({
-                    ...payload,
-                    name: res.data[0].name,
-                    img: res.data[0].img,
-                    des: res.data[0].des,
-                    price: res.data[0].price,
-                    capicity: res.data[0].capicity,
-                }),
-                
+                setPayload(res.data)
             )
             .then((err) => console.log(err));
-    }, []);
+    }, [id]);
     const validate = () => {
         let err = {};
         if (!payload.name) err.name = 'Không được để trống';
@@ -66,14 +53,14 @@ const UpdateRoomType = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validate()) {
-            const filesImg = payload.img.map((file) => file.name);
             const { img, ...payloadNew } = payload;
-            const payloadNew2 = { ...payloadNew, filesImg };
             axios
-                .post('http://localhost:5000/addRoomType', payloadNew2)
-                .then((res) =>
+                .post('http://localhost:5000/updateRoomType/'+id, payloadNew)
+                .then(
+                    // console.log("OK")
+                    (res) =>
                     Swal.fire({
-                        title: 'Thêm mới loại phòng thành công',
+                        title: 'Sửa thành công',
                         icon: 'success',
                     }).then(() => {
                         navigate('../roomType');
@@ -118,18 +105,19 @@ const UpdateRoomType = () => {
                                 />
                                 {invalidfield.name && <p className="text-red-600 italic">{invalidfield.name}</p>}
                             </div>
-                            <div className="mt-2">
-                                <label className="block text-sm text-gray-600">Ảnh</label>
-                                <input
-                                    accept="image/*"
-                                    type="file"
-                                    multiple
-                                    className="w-full px-5  py-4 text-gray-700 bg-gray-200 rounded outline-none"
-                                    name="img"
-                                    value={payload.img}
-                                    onChange={inputFiles}
-                                    onFocus={setInvalid}
-                                />
+                            <div className="mt-2 flex">
+                                <div>
+                                    <label className="block text-sm text-gray-600">Ảnh</label>
+                                </div>
+                                {Array.isArray(payload.img) && payload.img.length > 0 ? (
+                                    payload.img.map((path, index) => (
+                                        <div className=''>
+                                            <img key={index} src={require(`../../../uploads/${path}`)} alt={`Room image ${index + 1}`} style={{ maxWidth: '200px', margin: '10px' }} />
+                                        </div>
+                                    ))
+                                    ) : (
+                                    <p>No images available</p>
+                                    )}
                                 {invalidfield.img && <p className="text-red-600 italic">{invalidfield.img}</p>}
                             </div>
                             <div className="mt-2">

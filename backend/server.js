@@ -60,7 +60,7 @@ app.post('/signIn', (req, res) => {
 
 app.post('/addRoomType', (req, res) => {
     // Lưu các thông tin như tên phòng , mô tả ,...
-    const roomSql = 'INSERT INTO `roomtype`(`name`, `des`, `price`, `capicity`) VALUES (?,?,?,?)';
+    const roomSql = 'INSERT INTO roomtype(name, des, price, capicity) VALUES (?,?,?,?)';
     connect.query(roomSql, [req.body.name, req.body.des, req.body.price, req.body.capicity], (err, result) => {
         if (err) {
             console.error('Lỗi insert room : ', err);
@@ -90,15 +90,65 @@ app.get('/roomType',(req,res)=>{
         return res.json(result);
     })
 })
-
+app.post('/updateRoomType/:id', (req, res) => {
+    // Lưu các thông tin như tên phòng , mô tả ,...
+    const id = req.params.id;
+    const roomSql = 'UPDATE `roomtype` SET `name`=?,`des`=?,`price`=?,`capicity`=? WHERE  id = ?';
+    connect.query(roomSql, [req.body.name, req.body.des, req.body.price, req.body.capicity,id], (err, result) => {
+        if (err) {
+            return res.json({ err: err.message });
+        }
+        return res.json(result);
+    });
+});
 app.get('/getRoomType/:id',(req,res)=>{
-    const sql = 'SELECT * from roomtype where id= ? ';
+    const sql = 'SELECT roomType.id, roomType.name, roomType.des, roomType.price, roomType.capicity, GROUP_CONCAT(img.path) as img FROM roomType INNER JOIN img ON roomType.id = img.roomId WHERE roomType.id = ? GROUP BY roomType.id, roomType.name, roomType.des, roomType.price, roomType.capicity ';
     const id = req.params.id;
     connect.query(sql,[id],(err,result)=>{
         if(err){
-            return res.json({msg:"Lỗi"})
+            res.status(500).json({ error: 'Internal Server Error' });
         }
-        return res.json(result);
+        if (result.length > 0) {
+          const room = result[0];
+          room.img = room.img ? room.img.split(',') : [];
+          res.json(room);
+        } else {
+          res.status(404).json({ error: 'Room not found' });
+        }
+
+    })
+})
+
+app.delete('/deleteRoomType/:id',(req,res)=>{
+    const id = req.params.id;
+    connect.beginTransaction((err)=>{
+        if (err) {
+          return res.status(500).json({ error: 'Transaction error' });
+        }
+        const sqlImg = 'DELETE FROM img WHERE roomId = ?';
+        connect.query(sqlImg,[id],(err,result)=>{
+            if (err) {
+              return connect.rollback(() => {
+                res.status(500).json({ error: 'Không xóa được ảnh' });
+              });
+            }
+            const sql = 'DELETE FROM roomType WHERE id = ?';
+            connect.query(sql,[id],(err,result)=>{
+                if (err) {
+                  return connect.rollback(() => {
+                    res.status(500).json({ error: 'Không xóa được roomType' });
+                  });
+                }
+                connect.commit((err) => {
+                    if (err) {
+                      return connect.rollback(() => {
+                        res.status(500).json({ error: 'Commit error' });
+                      });
+                    }
+                    res.json({ message: 'Room and images deleted successfully' });
+                })
+            })
+        })
     })
 })
 app.listen(port, () => {
