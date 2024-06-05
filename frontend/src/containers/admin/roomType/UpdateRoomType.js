@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -14,6 +14,11 @@ const UpdateRoomType = () => {
     const { id } = useParams();
     const [invalidfield, setInvalidfield] = useState([]);
     const navigate = useNavigate();
+    const [files, setFiles] = useState([]);
+    const inputFiles = (e) => {
+        const uploadFiles = e.target.files;
+        setFiles([...files, ...uploadFiles]);
+    };
     const setValue = (e) => {
         const { name, value } = e.target;
         setPayload({ ...payload, [name]: value });
@@ -24,12 +29,19 @@ const UpdateRoomType = () => {
     };
     useEffect(() => {
         axios
-            .get(`http://localhost:5000/getRoomType/`+ id)
-            .then((res) =>
-                setPayload(res.data)
-            )
+            .get(`http://localhost:5000/getRoomType/` + id)
+            .then((res) => setPayload(res.data))
             .then((err) => console.log(err));
     }, [id]);
+    const renderFiles = () => (
+        <div className="flex mt-5">
+            {[...payload.img].map((f, key) => (
+                <div>
+                    <img src={require(`../../../image/${f}`)} width="200px" />
+                </div>
+            ))}
+        </div>
+    );
     const validate = () => {
         let err = {};
         if (!payload.name) err.name = 'Không được để trống';
@@ -53,20 +65,26 @@ const UpdateRoomType = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validate()) {
-            const { img, ...payloadNew } = payload;
+            const formData = new FormData();
+            formData.append('name', payload.name);
+            formData.append('des', payload.des);
+            formData.append('price', payload.price);
+            formData.append('capicity', payload.capicity);
+            files.forEach((file) => {
+                formData.append('images', file);
+            });
             axios
-                .post('http://localhost:5000/updateRoomType/'+id, payloadNew)
-                .then(
-                    // console.log("OK")
-                    (res) =>
+                .post('http://localhost:5000/updateRoomType/' + id, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                .then((res) =>
                     Swal.fire({
                         title: 'Sửa thành công',
                         icon: 'success',
-                    }).then(() => {
-                        navigate('../roomType');
-                    }),
-                )
-                .catch((err) => console.log(err.message));
+                    }).then(()=>navigate('../roomType'))
+                );
         } else {
             setInvalidfield(validate);
         }
@@ -105,19 +123,20 @@ const UpdateRoomType = () => {
                                 />
                                 {invalidfield.name && <p className="text-red-600 italic">{invalidfield.name}</p>}
                             </div>
-                            <div className="mt-2 flex">
+                            <div className="mt-2">
                                 <div>
                                     <label className="block text-sm text-gray-600">Ảnh</label>
+                                    <input
+                                        accept="image/*"
+                                        type="file"
+                                        multiple
+                                        className="w-full px-5  py-4 text-gray-700 bg-gray-200 rounded outline-none"
+                                        name="img"
+                                        onChange={inputFiles}
+                                        onFocus={setInvalid}
+                                    />
                                 </div>
-                                {Array.isArray(payload.img) && payload.img.length > 0 ? (
-                                    payload.img.map((path, index) => (
-                                        <div className=''>
-                                            <img key={index} src={require(`../../../uploads/${path}`)} alt={`Room image ${index + 1}`} style={{ maxWidth: '200px', margin: '10px' }} />
-                                        </div>
-                                    ))
-                                    ) : (
-                                    <p>No images available</p>
-                                    )}
+                                {renderFiles()}
                                 {invalidfield.img && <p className="text-red-600 italic">{invalidfield.img}</p>}
                             </div>
                             <div className="mt-2">

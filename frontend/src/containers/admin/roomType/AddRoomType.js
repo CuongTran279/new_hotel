@@ -6,52 +6,71 @@ import Swal from 'sweetalert2';
 const AddRoomType = () => {
     const [payload, setPayload] = useState({
         name: '',
-        img: '',
         des: '',
         price: '',
         capicity: '',
     });
-    const [invalidfield,setInvalidfield] = useState([]);
-    const navigate = useNavigate()
+    const [invalidfield, setInvalidfield] = useState([]);
+    const [files, setFiles] = useState([]);
+    const navigate = useNavigate();
     const setValue = (e) => {
         const { name, value } = e.target;
         setPayload({ ...payload, [name]: value });
     };
     const inputFiles = (e) => {
-        const files = Array.from(e.target.files);
-        setPayload({ ...payload, img: files });
+        const uploadFiles = e.target.files;
+        setFiles([...files,...uploadFiles]);
     };
-    const setInvalid = (e)=>{
+    const setInvalid = (e) => {
         const { name } = e.target;
         setInvalidfield({ ...invalidfield, [name]: undefined });
-    }
-    const validate = ()=>{
+    };
+    const renderFiles = () => (
+        <div className="flex mt-5">
+            {[...files].map((f, key) => (
+                <div>
+                    <img src={URL.createObjectURL(f)} width="200px" />
+                </div>
+            ))}
+        </div>
+    );
+    const validate = () => {
         let err = {};
-        if(!payload.name) err.name = "Không được để trống";
-        if(!payload.img) err.img = "Không được để trống";
-        if(!payload.des) err.des = "Không được để trống";
-        if(!payload.price){
-           err.price = "Không được để trống"; 
-        }else if(!payload.price.match(/^\d+$/)){
-            err.price = "Giá phải là dạng số"; 
+        if (!payload.name) err.name = 'Không được để trống';
+        if (!files) err.img = 'Không được để trống';
+        if (!payload.des) err.des = 'Không được để trống';
+        if (!payload.price) {
+            err.price = 'Không được để trống';
+        } else if (!payload.price.match(/^\d+$/)) {
+            err.price = 'Giá phải là dạng số';
         }
-        if(!payload.capicity){
-            err.capicity = "Không được để trống";
-        }else if(!payload.capicity.match(/^\d+$/)){
-            err.capicity = "Số lượng người phải là dạng số";
-        }else if(!payload.capicity.match(/^[0-9]$/)){
-            err.capicity = "Một phòng chứa tối đa 9 người";
+        if (!payload.capicity) {
+            err.capicity = 'Không được để trống';
+        } else if (!payload.capicity.match(/^\d+$/)) {
+            err.capicity = 'Số lượng người phải là dạng số';
+        } else if (!payload.capicity.match(/^[0-9]$/)) {
+            err.capicity = 'Một phòng chứa tối đa 9 người';
         }
         setInvalidfield(err);
         return Object.keys(err).length === 0;
-    }
+    };
     const handleSubmit = (e) => {
         e.preventDefault();
-            if(validate()){
-                const filesImg = payload.img.map(file=>file.name);
-                const {img,...payloadNew} = payload
-                const payloadNew2 = {...payloadNew,filesImg};
-                axios.post('http://localhost:5000/addRoomType',payloadNew2)
+        const formData = new FormData();
+        formData.append('name',payload.name);
+        formData.append('des',payload.des);
+        formData.append('price',payload.price);
+        formData.append('capicity',payload.capicity);
+        files.forEach((file)=>{
+            formData.append('images',file);
+        })
+        if (validate()) {
+            axios
+                .post('http://localhost:5000/addRoomType', formData,{
+                    headers:{
+                        'Content-Type':'multipart/form-data'
+                    }
+                })
                 .then((res) =>
                     Swal.fire({
                         title: 'Thêm mới loại phòng thành công',
@@ -60,12 +79,10 @@ const AddRoomType = () => {
                         navigate('../roomType');
                     }),
                 )
-                .catch((err)=>console.log(err.message))
-            }else{
-                setInvalidfield(validate);
-            }
-            
-        
+                .catch((err) => console.log(err.message));
+        } else {
+            setInvalidfield(validate);
+        }
     };
     return (
         <div>
@@ -85,7 +102,10 @@ const AddRoomType = () => {
                 <main className="w-full flex-grow p-6">
                     <h1 className="text-3xl text-black pb-6">Thêm mới RoomType</h1>
                     <div className="bg-white overflow-auto">
-                        <form className="p-10 bg-white rounded shadow-xl" onSubmit={handleSubmit} encType="multipart/form-data">
+                        <form
+                            className="p-10 bg-white rounded shadow-xl"
+                            onSubmit={handleSubmit}
+                        >
                             <div className="mt-2">
                                 <label className="block text-sm text-gray-600">Tên phòng</label>
                                 <input
@@ -95,7 +115,7 @@ const AddRoomType = () => {
                                     onChange={setValue}
                                     onFocus={setInvalid}
                                 />
-                                {invalidfield.name && <p className='text-red-600 italic'>{invalidfield.name}</p> }
+                                {invalidfield.name && <p className="text-red-600 italic">{invalidfield.name}</p>}
                             </div>
                             <div className="mt-2">
                                 <label className="block text-sm text-gray-600">Ảnh</label>
@@ -108,7 +128,8 @@ const AddRoomType = () => {
                                     onChange={inputFiles}
                                     onFocus={setInvalid}
                                 />
-                                {invalidfield.img && <p className='text-red-600 italic'>{invalidfield.img}</p> }
+                                {renderFiles()}
+                                {invalidfield.img && <p className="text-red-600 italic">{invalidfield.img}</p>}
                             </div>
                             <div className="mt-2">
                                 <label className="block text-sm text-gray-600">Mô tả</label>
@@ -119,7 +140,7 @@ const AddRoomType = () => {
                                     onChange={setValue}
                                     onFocus={setInvalid}
                                 />
-                                {invalidfield.des && <p className='text-red-600 italic'>{invalidfield.des}</p> }
+                                {invalidfield.des && <p className="text-red-600 italic">{invalidfield.des}</p>}
                             </div>
                             <div className="mt-2">
                                 <label className="block text-sm text-gray-600">Giá</label>
@@ -130,7 +151,7 @@ const AddRoomType = () => {
                                     onChange={setValue}
                                     onFocus={setInvalid}
                                 />
-                                {invalidfield.price && <p className='text-red-600 italic'>{invalidfield.price}</p> }
+                                {invalidfield.price && <p className="text-red-600 italic">{invalidfield.price}</p>}
                             </div>
                             <div className="mt-2">
                                 <label className="block text-sm text-gray-600">Số người tối đa 1 phòng</label>
@@ -141,12 +162,14 @@ const AddRoomType = () => {
                                     onChange={setValue}
                                     onFocus={setInvalid}
                                 />
-                                {invalidfield.capicity && <p className='text-red-600 italic'>{invalidfield.capicity}</p> }
+                                {invalidfield.capicity && (
+                                    <p className="text-red-600 italic">{invalidfield.capicity}</p>
+                                )}
                             </div>
                             <div className="mt-5">
                                 <button
                                     className="font-semibold uppercase p-2 bg-[#1947ee] text-white rounded-xl hover:bg-[#3d68ff]"
-                                    type='submit'
+                                    type="submit"
                                 >
                                     Thêm mới
                                 </button>

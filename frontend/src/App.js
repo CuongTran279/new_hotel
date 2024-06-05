@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Home, Login, MainContent, Register, NotFound } from './containers/public';
-import { LayoutAdmin,MainContentAdmin,ListRoomType,AddRoomType,UpdateRoomType } from './containers/admin';
+import { LayoutAdmin, MainContentAdmin, ListRoomType, AddRoomType, UpdateRoomType } from './containers/admin';
 
 function ProtectedRoute({ children, allowedRole }) {
     const userRole = parseInt(localStorage.getItem('role'), 10);
@@ -21,11 +21,14 @@ function App() {
                         <Route path="/notfound" element={<NotFound />} />
                         <Route path="*" element={<Navigate to="/notfound" />} />
                     </Route>
-                    <Route path="/admin" element={
-                        <ProtectedRoute allowedRole={1}>
-                            <LayoutAdmin />
-                        </ProtectedRoute>
-                    }>
+                    <Route
+                        path="/admin"
+                        element={
+                            <ProtectedRoute allowedRole={1}>
+                                <LayoutAdmin />
+                            </ProtectedRoute>
+                        }
+                    >
                         <Route index element={<MainContentAdmin />} />
                         <Route path="addRoomType" element={<AddRoomType />} />
                         <Route path="roomType" element={<ListRoomType />} />
