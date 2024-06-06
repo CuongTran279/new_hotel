@@ -2,31 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import axios from 'axios';
-const ListRoomType = () => {
-    const [payload, setPayload] = useState([]);
-    const navigate = useNavigate();
-    useEffect(() => {
-        axios
-            .get('http://localhost:5000/roomType')
-            .then((res) => setPayload(res.data))
-            .catch((err) => console.log(err));
-    }, []);
-    const handleDelete = (id) => {
-        const confirm = window.confirm("Bạn có chắc chắn muốn xóa?");
-        if(confirm){
-            axios
-            .delete('http://localhost:5000/deleteRoomType/' + id)
-            .then((res) => {
-                Swal.fire({
-                    title: 'Xóa thành công',
-                    icon: 'success',
-                }).then(() => {
-                    window.location.reload();
-                });
-            })
-            .then((err) => console.log(err));
-        }
-    };
+
+const ListHotel = () => {
     return (
         <div>
             <header className="w-full items-center bg-white py-2 px-6 sm:flex">
@@ -43,12 +20,12 @@ const ListRoomType = () => {
             </header>
             <div className="w-full border-t flex flex-col">
                 <main className="w-full flex-grow p-6">
-                    <h1 className="text-3xl text-black pb-6">RoomType</h1>
+                    <h1 className="text-3xl text-black pb-6">Hotel</h1>
                     <div className="w-full mt-6">
                         <div className="flex align-middle">
                             <p className="text-xl pb-3 relative w-1/2 flex justify-start">Danh sách</p>
                             <div className="pb-3 relative w-1/2 flex justify-end">
-                                <Link to="../addRoomType">
+                                <Link to="../addHotel">
                                     <button className="font-semibold uppercase p-5 bg-[#1947ee] text-white rounded-xl hover:bg-[#3d68ff]">
                                         Thêm mới
                                     </button>
@@ -56,7 +33,7 @@ const ListRoomType = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white ">
+                        {/* <div className="bg-white ">
                             <table className="min-w-full bg-white ">
                                 <thead className="bg-gray-800 text-white text-center justify-center">
                                     <tr>
@@ -87,7 +64,7 @@ const ListRoomType = () => {
                                     <tbody className="text-gray-700 text-center">
                                         {payload.map((room, i) => {
                                             return (
-                                                <tr key={i} className='text-center'>
+                                                <tr key={i} className="text-center">
                                                     <td className=" py-3 px-4">{room.id}</td>
                                                     <td className=" py-3 px-4">{room.name}</td>
                                                     <td className=" py-3 px-4 grid grid-cols-2 text-center">
@@ -129,7 +106,7 @@ const ListRoomType = () => {
                                     <h1 className="uppercase"> Chưa có bản ghi nào </h1>
                                 )}
                             </table>
-                        </div>
+                        </div> */}
                     </div>
                 </main>
             </div>
@@ -137,4 +114,4 @@ const ListRoomType = () => {
     );
 };
 
-export default ListRoomType;
+export default ListHotel;

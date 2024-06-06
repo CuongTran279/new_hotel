@@ -17,7 +17,19 @@ const storage = multer.diskStorage({
         return cb(null, '../frontend/src/image');
     },
     filename: function (req, file, cb) {
-        return cb(null, Date.now() + '.jpg');
+        const filename =  Date.now()+'.jpg';
+        const filepath = path.join('../frontend/src/image/', filename);
+
+        // Kiểm tra nếu tệp đã tồn tại
+        fs.access(filepath, fs.constants.F_OK, (err) => {
+            if (err) {
+                // Tệp không tồn tại, tiếp tục lưu trữ tệp
+                cb(null, filename);
+            } else {
+                // Tệp tồn tại, bỏ qua tệp này (trả về null để không lưu tệp)
+                cb(null, false);
+            }
+        });
     },
 });
 
@@ -95,39 +107,6 @@ app.get('/roomType', (req, res) => {
         return res.json(result);
     });
 });
-// app.post('/updateRoomType/:id', upload.array('images', 4), (req, res) => {
-//     const id = req.params.id;
-//     const roomSql = 'UPDATE `roomtype` SET `name`=?,`des`=?,`price`=?,`capicity`=? WHERE  id = ?';
-//     connect.query(roomSql, [req.body.name, req.body.des, req.body.price, req.body.capicity, id], (err, result) => {
-//         if (err) {
-//             console.error('Lỗi Update room : ', err);
-//             return res.status(500).send('Internal server error');
-//         }
-
-//         if (!req.files || req.files.length === 0) {
-//             return res.json(result);
-//         }
-
-//         const imgSql = 'UPDATE `img` SET path = ? WHERE roomId = ?';
-//         // Sử dụng Promise.all để đợi tất cả các truy vấn hoàn thành trước khi gửi phản hồi
-//         const promises = req.files.map((file) => {
-//                 connect.query(imgSql, [file.filename, id], (err) => {
-//                     if (err) {
-//                         console.error('Lỗi insert img : ', err);
-//                     }
-//                 });
-//             console.log(file.filename);
-//         });
-//         Promise.all(promises)
-//             .then(() => {
-//                 res.json(result);
-//             })
-//             .catch((err) => {
-//                 console.error('Lỗi xử lý truy vấn hình ảnh: ', err);
-//                 res.status(500).send('Internal server error');
-//             });
-//     });
-// });
 app.post('/updateRoomType/:id', upload.array('images', 4), (req, res) => {
     const roomId = req.params.id;
 
@@ -182,7 +161,7 @@ app.get('/getRoomType/:id', (req, res) => {
             res.status(404).json({ error: 'Room not found' });
         }
     });
-});
+}); 
 
 app.delete('/deleteRoomType/:id', (req, res) => {
     const id = req.params.id;
@@ -221,6 +200,27 @@ app.delete('/deleteRoomType/:id', (req, res) => {
         });
     });
 });
+
+app.post('/addHotel', (req, res) => {
+    const roomSql = 'INSERT INTO hotel(name, address, phone) VALUES (?,?,?)';
+    connect.query(roomSql, [req.body.name, req.body.address, req.body.phone], (err, result) => {
+        if (err) {
+            console.error('Lỗi insert hotel : ', err);
+            return res.status(500).send('Internal server error');
+        }
+        const hotelId = result.insertId;
+        const room = req.body.options.split(',').map((room)=>[hotelId,room])
+        const roomSql = 'INSERT INTO room(hotelId, roomId) VALUES ?';
+        connect.query(roomSql, [room], (err) => {
+            if (err) {
+                console.error('Lỗi insert room : ', err);
+                return res.status(500).send('Internal server error');
+            }
+            res.status(201).send('Insert thành công');
+        });
+    });
+});
+
 app.listen(port, () => {
     console.log('Server is running on ' + port);
 });
