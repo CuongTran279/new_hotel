@@ -4,6 +4,54 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const ListHotel = () => {
+    const [payload, setPayload] = useState([]);
+    useEffect(() => {
+        axios
+            .get('http://localhost:5000/hotel')
+            .then((res) => {
+                const hotelMap = new Map();
+
+                res.data.forEach((hotel) => {
+                    const {
+                        id,
+                        name,
+                        address,
+                        phone,
+                        roomTypeId,
+                        roomTypeName,
+                        roomDescription,
+                        roomPrice,
+                        roomCapacity,
+                        roomImages,
+                        roomQuantity
+                    } = hotel;
+
+                    if (!hotelMap.has(id)) {
+                        hotelMap.set(id, {
+                            id,
+                            name,
+                            address,
+                            phone,
+                            rooms: [],
+                        });
+                    }
+
+                    const hotelData = hotelMap.get(id);
+                    hotelData.rooms.push({
+                        id: roomTypeId,
+                        name: roomTypeName,
+                        description: roomDescription,
+                        price: roomPrice,
+                        capacity: roomCapacity,
+                        quantity:roomQuantity,
+                        images: roomImages.split('|'),
+                    });
+                });
+
+                setPayload(Array.from(hotelMap.values()));
+            })
+            .catch((err) => console.log(err));
+    }, []);
     return (
         <div>
             <header className="w-full items-center bg-white py-2 px-6 sm:flex">
@@ -33,7 +81,7 @@ const ListHotel = () => {
                             </div>
                         </div>
 
-                        {/* <div className="bg-white ">
+                        <div className="bg-white ">
                             <table className="min-w-full bg-white ">
                                 <thead className="bg-gray-800 text-white text-center justify-center">
                                     <tr>
@@ -44,16 +92,13 @@ const ListHotel = () => {
                                             Name
                                         </th>
                                         <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">
-                                            IMG
+                                            Address
                                         </th>
                                         <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">
-                                            Description
+                                            phone
                                         </th>
                                         <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">
-                                            Price
-                                        </th>
-                                        <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">
-                                            Capicity
+                                            Room
                                         </th>
                                         <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">
                                             Action
@@ -62,36 +107,43 @@ const ListHotel = () => {
                                 </thead>
                                 {payload.length !== 0 ? (
                                     <tbody className="text-gray-700 text-center">
-                                        {payload.map((room, i) => {
+                                        {payload.map((hotel, i) => {
+                                            console.log(hotel);
                                             return (
                                                 <tr key={i} className="text-center">
-                                                    <td className=" py-3 px-4">{room.id}</td>
-                                                    <td className=" py-3 px-4">{room.name}</td>
-                                                    <td className=" py-3 px-4 grid grid-cols-2 text-center">
-                                                        {JSON.parse(room.img_paths.split(',')).map((element, i) => {
-                                                            return (
-                                                                <div className="w-24 h-24" key={i}>
+                                                    <td className=" py-3 px-4">{hotel.id}</td>
+                                                    <td className=" py-3 px-4">{hotel.name}</td>
+                                                    <td className=" py-3 px-4">{hotel.address}</td>
+                                                    <td className=" py-3 px-4">{hotel.phone}</td>
+                                                    <td className=" py-3 px-4 grid grid-rows text-left w-[500px]">
+                                                        {hotel.rooms.map((room, key) => (
+                                                            <div key={key} className="border-b mb-5">
+                                                                {room.images.map((image, imgIndex) => (
                                                                     <img
-                                                                        src={require(`../../../image/${element}`)}
-                                                                        alt="Ok"
+                                                                        key={imgIndex}
+                                                                        src={require(`../../../image/${image}`)}
+                                                                        alt={room.name}
+                                                                        className="w-28 mb-10 flex"
                                                                     />
-                                                                </div>
-                                                            );
-                                                        })}
+                                                                ))}
+                                                                <h3>Room Type: {room.name}</h3>
+                                                                <p>Description: {room.description}</p>
+                                                                <p>Price: {room.price}</p>
+                                                                <p>Capacity: {room.capacity}</p>
+                                                                <p>Quantity: {room.quantity}</p>
+                                                            </div>
+                                                        ))}
                                                     </td>
-                                                    <td className=" py-3 px-4">{room.des}</td>
-                                                    <td className=" py-3 px-4">{room.price}</td>
-                                                    <td className=" py-3 px-4">{room.capicity}</td>
-                                                    <td className="grid grid-cols-2 gap-5">
+                                                    <td>
                                                         <button
-                                                            onClick={() => navigate(`../updateRoomType/${room.id}`)}
+                                                            // onClick={() => navigate(`../updateRoomType/${room.id}`)}
                                                             type=""
-                                                            className="p-2 outline-none bg-[#4183ec] text-white rounded-md hover:bg-[#5392f9]"
+                                                            className="p-2 outline-none bg-[#4183ec] text-white rounded-md hover:bg-[#5392f9] mr-2"
                                                         >
                                                             Edit
                                                         </button>
                                                         <button
-                                                            onClick={() => handleDelete(room.id)}
+                                                            // onClick={() => handleDelete(room.id)}
                                                             type=""
                                                             className="p-2 outline-none bg-[#c53456] text-white rounded-md hover:bg-[#ff567d]"
                                                         >
@@ -106,7 +158,7 @@ const ListHotel = () => {
                                     <h1 className="uppercase"> Chưa có bản ghi nào </h1>
                                 )}
                             </table>
-                        </div> */}
+                        </div>
                     </div>
                 </main>
             </div>

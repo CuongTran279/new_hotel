@@ -18,6 +18,9 @@ const AddHotel = () => {
         const { name } = e.target;
         setInvalidfield({ ...invalidfield, [name]: undefined });
     };
+    // const handleOptionChange = (e) => {
+    //     setSelectedOptions(e.target.value);
+    // };
     const setValue = (e) => {
         const { name, value } = e.target;
         setPayload({ ...payload, [name]: value });
@@ -38,16 +41,20 @@ const AddHotel = () => {
         setInvalidfield(err);
         return Object.keys(err).length === 0;
     };
+    const handleOptionChange = (event) => {
+        const value = event.target.value;
+        setSelectedOptions((prevSelectedOptions) =>
+            prevSelectedOptions.includes(value)
+                ? prevSelectedOptions.filter((option) => option !== value)
+                : [...prevSelectedOptions, value],
+        );
+    };
     useEffect(() => {
         axios
             .get('http://localhost:5000/roomType')
             .then((res) => setOptions(res.data))
             .catch((err) => console.log(err));
     }, []);
-    const handleSelectChange = (event) => {
-        const selectedValues = Array.from(event.target.selectedOptions, (option) => option.value);
-        setSelectedOptions(selectedValues);
-    };
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validate()) {
@@ -55,20 +62,21 @@ const AddHotel = () => {
             formData.append('name', payload.name);
             formData.append('address', payload.address);
             formData.append('phone', payload.phone);
-            const selectedOptionsString = selectedOptions.join(', ');
-            formData.append('options', selectedOptionsString);
+            formData.append('options', selectedOptions);
             const formObject = Object.fromEntries(formData.entries());
             setFormData(formObject);
-            axios.post('http://localhost:5000/addHotel',formObject)
-            .then((res) =>
-                Swal.fire({
-                    title: 'Thêm mới khách sạn thành công',
-                    icon: 'success',
-                }).then(() => {
-                    navigate('../hotel');
-                }),
-            )
-            .catch((err) => console.log(err.message));
+            console.log(formObject);
+            axios
+                .post('http://localhost:5000/addHotel', formObject)
+                .then((res) =>
+                    Swal.fire({
+                        title: 'Thêm mới khách sạn thành công',
+                        icon: 'success',
+                    }).then(() => {
+                        navigate('../hotel');
+                    }),
+                )
+                .catch((err) => console.log(err.message));
         } else {
             setInvalidfield(validate);
         }
@@ -127,13 +135,14 @@ const AddHotel = () => {
                             </div>
                             <div className="mt-2">
                                 <label className="block text-sm text-gray-600">Các loại phòng</label>
-                                <select multiple value={selectedOptions} onChange={handleSelectChange}>
+                                <div className="flex flex-col gap-10">
                                     {options.map((option) => (
-                                        <option key={option.id} value={option.id}>
+                                        <label key={option.id}>
+                                            <input type="checkbox" value={option.id} onChange={handleOptionChange} checked={selectedOptions.includes(option.id.toString())}/>
                                             {option.name}
-                                        </option>
+                                        </label>
                                     ))}
-                                </select>
+                                </div>
                             </div>
                             <div className="mt-5">
                                 <button

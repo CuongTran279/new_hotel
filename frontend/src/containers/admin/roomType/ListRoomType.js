@@ -12,19 +12,19 @@ const ListRoomType = () => {
             .catch((err) => console.log(err));
     }, []);
     const handleDelete = (id) => {
-        const confirm = window.confirm("Bạn có chắc chắn muốn xóa?");
-        if(confirm){
+        const confirm = window.confirm('Bạn có chắc chắn muốn xóa?');
+        if (confirm) {
             axios
-            .delete('http://localhost:5000/deleteRoomType/' + id)
-            .then((res) => {
-                Swal.fire({
-                    title: 'Xóa thành công',
-                    icon: 'success',
-                }).then(() => {
-                    window.location.reload();
-                });
-            })
-            .then((err) => console.log(err));
+                .delete('http://localhost:5000/deleteRoomType/' + id)
+                .then((res) => {
+                    Swal.fire({
+                        title: 'Xóa thành công',
+                        icon: 'success',
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                })
+                .then((err) => console.log(err));
         }
     };
     return (
@@ -87,7 +87,7 @@ const ListRoomType = () => {
                                     <tbody className="text-gray-700 text-center">
                                         {payload.map((room, i) => {
                                             return (
-                                                <tr key={i} className='text-center'>
+                                                <tr key={i} className="text-center">
                                                     <td className=" py-3 px-4">{room.id}</td>
                                                     <td className=" py-3 px-4">{room.name}</td>
                                                     <td className=" py-3 px-4 grid grid-cols-2 text-center">
@@ -102,7 +102,9 @@ const ListRoomType = () => {
                                                             );
                                                         })}
                                                     </td>
-                                                    <td className=" py-3 px-4">{room.des}</td>
+                                                    <td className=" w-72 whitespace-normal break-words truncate ">
+                                                        {room.des}
+                                                    </td>
                                                     <td className=" py-3 px-4">{room.price}</td>
                                                     <td className=" py-3 px-4">{room.capicity}</td>
                                                     <td className="grid grid-cols-2 gap-5">

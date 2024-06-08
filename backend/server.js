@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
         return cb(null, '../frontend/src/image');
     },
     filename: function (req, file, cb) {
-        const filename =  Date.now()+'.jpg';
+        const filename = Date.now() + path.extname(file.originalname) + '.jpg';
         const filepath = path.join('../frontend/src/image/', filename);
 
         // Kiểm tra nếu tệp đã tồn tại
@@ -109,18 +109,15 @@ app.get('/roomType', (req, res) => {
 });
 app.post('/updateRoomType/:id', upload.array('images', 4), (req, res) => {
     const roomId = req.params.id;
-
-    // Kiểm tra nếu không có tệp nào được tải lên
-    if (!req.files || req.files.length === 0) {
-        return res.status(400).send('Không có file nào được upload');
-    }
-
     // Cập nhật thông tin loại phòng
     const updateRoomSql = 'UPDATE roomtype SET name = ?, des = ?, price = ?, capicity = ? WHERE id = ?';
     connect.query(updateRoomSql, [req.body.name, req.body.des, req.body.price, req.body.capicity, roomId], (err) => {
         if (err) {
             console.error('Lỗi cập nhật loại phòng: ', err);
             return res.status(500).send('Internal server error');
+        }
+        if (!req.files || req.files.length === 0) {
+            return res.status(200).send('Cập nhật thành công');
         }
 
         // Xóa các hình ảnh cũ liên quan đến loại phòng này
@@ -161,7 +158,7 @@ app.get('/getRoomType/:id', (req, res) => {
             res.status(404).json({ error: 'Room not found' });
         }
     });
-}); 
+});
 
 app.delete('/deleteRoomType/:id', (req, res) => {
     const id = req.params.id;
@@ -209,7 +206,7 @@ app.post('/addHotel', (req, res) => {
             return res.status(500).send('Internal server error');
         }
         const hotelId = result.insertId;
-        const room = req.body.options.split(',').map((room)=>[hotelId,room])
+        const room = req.body.options.split(',').map((room) => [hotelId, room]);
         const roomSql = 'INSERT INTO room(hotelId, roomId) VALUES ?';
         connect.query(roomSql, [room], (err) => {
             if (err) {
@@ -218,6 +215,17 @@ app.post('/addHotel', (req, res) => {
             }
             res.status(201).send('Insert thành công');
         });
+    });
+});
+
+app.get('/hotel', (req, res) => {
+    const sql =
+        "SELECT hotel.id, hotel.name, hotel.address, hotel.phone, room.quantity as roomQuantity, roomType.id as roomTypeId, roomType.name as roomTypeName, roomType.des as roomDescription, roomType.price as roomPrice, roomType.capicity as roomCapacity, GROUP_CONCAT(img.path SEPARATOR '|') as roomImages FROM hotel INNER JOIN room ON room.hotelId = hotel.id INNER JOIN roomType ON room.roomId = roomType.id INNER JOIN img ON img.roomId = roomType.id GROUP BY hotel.id, hotel.name, hotel.address, hotel.phone, roomType.id, roomType.name, roomType.des, roomType.price, roomType.capicity, room.quantity";
+    connect.query(sql, (err, result) => {
+        if (err) {
+            return res.json({ msg: 'Lỗi' });
+        }
+        return res.json(result);
     });
 });
 
