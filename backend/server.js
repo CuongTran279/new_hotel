@@ -229,6 +229,56 @@ app.get('/hotel', (req, res) => {
     });
 });
 
+app.delete('/deleteHotel/:id', (req, res) => {
+    const id = req.params.id;
+
+    connect.beginTransaction((err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Transaction error' });
+        }
+
+        const sqlImg = 'DELETE FROM room WHERE hotelId = ?';
+        connect.query(sqlImg, [id], (err, result) => {
+            if (err) {
+                return connect.rollback(() => {
+                    res.status(500).json({ error: 'Không xóa được các phòng trong khách sạn' });
+                });
+            }
+
+            const sql = 'DELETE FROM hotel WHERE id = ?';
+            connect.query(sql, [id], (err, result) => {
+                if (err) {
+                    return connect.rollback(() => {
+                        res.status(500).json({ error: 'Không xóa được hotel' });
+                    });
+                }
+
+                connect.commit((err) => {
+                    if (err) {
+                        return connect.rollback(() => {
+                            res.status(500).json({ error: 'Commit error' });
+                        });
+                    }
+
+                    res.json({ message: 'Khách sạn đã được xóa' });
+                });
+            });
+        });
+    });
+});
+
+app.get('/getHotel/:id', (req, res) => {
+    const id = req.params.id;
+    const sql =
+        "SELECT hotel.id, hotel.name, hotel.address, hotel.phone, room.quantity as roomQuantity, roomType.id as roomTypeId, roomType.name as roomTypeName, roomType.des as roomDescription, roomType.price as roomPrice, roomType.capicity as roomCapacity, GROUP_CONCAT(img.path SEPARATOR '|') as roomImages FROM hotel INNER JOIN room ON room.hotelId = hotel.id INNER JOIN roomType ON room.roomId = roomType.id INNER JOIN img ON img.roomId = roomType.id WHERE hotel.id = ? GROUP BY hotel.id, hotel.name, hotel.address, hotel.phone, roomType.id, roomType.name, roomType.des, roomType.price, roomType.capicity, room.quantity";
+    connect.query(sql, [id], (err, result) => {
+        if (err) {
+            return res.json({ msg: 'Lỗi' });
+        }
+        return res.json(result);
+    });
+});
+
 app.listen(port, () => {
     console.log('Server is running on ' + port);
 });

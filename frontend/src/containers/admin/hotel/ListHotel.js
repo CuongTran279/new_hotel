@@ -5,6 +5,23 @@ import axios from 'axios';
 
 const ListHotel = () => {
     const [payload, setPayload] = useState([]);
+    const navigate = useNavigate();
+    const handleDelete = (id) => {
+        const confirm = window.confirm('Bạn có chắc chắn muốn xóa?');
+        if (confirm) {
+            axios
+                .delete('http://localhost:5000/deleteHotel/' + id)
+                .then((res) => {
+                    Swal.fire({
+                        title: 'Xóa thành công',
+                        icon: 'success',
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                })
+                .then((err) => console.log(err));
+        }
+    };
     useEffect(() => {
         axios
             .get('http://localhost:5000/hotel')
@@ -23,7 +40,7 @@ const ListHotel = () => {
                         roomPrice,
                         roomCapacity,
                         roomImages,
-                        roomQuantity
+                        roomQuantity,
                     } = hotel;
 
                     if (!hotelMap.has(id)) {
@@ -43,7 +60,7 @@ const ListHotel = () => {
                         description: roomDescription,
                         price: roomPrice,
                         capacity: roomCapacity,
-                        quantity:roomQuantity,
+                        quantity: roomQuantity,
                         images: roomImages.split('|'),
                     });
                 });
@@ -136,14 +153,14 @@ const ListHotel = () => {
                                                     </td>
                                                     <td>
                                                         <button
-                                                            // onClick={() => navigate(`../updateRoomType/${room.id}`)}
+                                                            onClick={() => navigate(`../updateHotel/${hotel.id}`)}
                                                             type=""
                                                             className="p-2 outline-none bg-[#4183ec] text-white rounded-md hover:bg-[#5392f9] mr-2"
                                                         >
                                                             Edit
                                                         </button>
                                                         <button
-                                                            // onClick={() => handleDelete(room.id)}
+                                                            onClick={() => handleDelete(hotel.id)}
                                                             type=""
                                                             className="p-2 outline-none bg-[#c53456] text-white rounded-md hover:bg-[#ff567d]"
                                                         >
