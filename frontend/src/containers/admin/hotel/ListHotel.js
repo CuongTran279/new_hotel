@@ -123,7 +123,7 @@ const ListHotel = () => {
                                     </tr>
                                 </thead>
                                 {payload.length !== 0 ? (
-                                    <tbody className="text-gray-700 text-center">
+                                    <tbody className="text-gray-700 text-center border-b">
                                         {payload.map((hotel, i) => {
                                             console.log(hotel);
                                             return (
@@ -148,6 +148,7 @@ const ListHotel = () => {
                                                                 <p>Price: {room.price}</p>
                                                                 <p>Capacity: {room.capacity}</p>
                                                                 <p>Quantity: {room.quantity}</p>
+                                                                
                                                             </div>
                                                         ))}
                                                     </td>
