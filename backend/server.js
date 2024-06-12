@@ -279,20 +279,20 @@ app.get('/getHotel/:id', (req, res) => {
     });
 });
 
-app.post('/updateQuantityRoom',(req,res)=>{
-    const {hotelId,roomId,quantity} = req.body;
+app.post('/updateQuantityRoom', (req, res) => {
+    const { hotelId, roomId, quantity } = req.body;
     const sql = `UPDATE room SET quantity = ? WHERE hotelId = ? AND roomId = ? `;
-    connect.query(sql,[quantity,hotelId,roomId],(err,result)=>{
-        if(err){
+    connect.query(sql, [quantity, hotelId, roomId], (err, result) => {
+        if (err) {
             console.error('Lỗi update Room : ', err);
             return res.status(500).send('Internal server error');
         }
         if (result.affectedRows === 0) {
             return res.status(404).send('Room not found');
-          }
+        }
         res.status(200).send('Room quantity updated successfully');
-    })
-})
+    });
+});
 
 app.listen(port, () => {
     console.log('Server is running on ' + port);
