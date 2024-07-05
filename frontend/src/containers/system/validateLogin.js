@@ -31,6 +31,9 @@ export const validate = (payload) => {
   if (!payload.address) {
     newErrors.address = "Địa chỉ không được để trống.";
   }
+  if (!payload.fullname) {
+    newErrors.fullname = "Họ và tên không được để trống.";
+  }
   if (!payload.email) {
     newErrors.email = "Email không được để trống.";
   } else if (!payload.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {

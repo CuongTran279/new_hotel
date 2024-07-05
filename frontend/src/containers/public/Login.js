@@ -12,6 +12,7 @@ const Login = () => {
         pass: '',
         phone: '',
         address: '',
+        fullname: '',
         repass: '',
     });
     const navigate = useNavigate();
@@ -80,6 +81,15 @@ const Login = () => {
                         {invalidfield.phone && <p style={{ color: 'red' }}>{invalidfield.phone}</p>}
                         <InputForm
                             setInvalidfield={setInvalidfield}
+                            text="Họ và tên"
+                            dropShadow="focus:drop-shadow-blue"
+                            value={payload.fullname}
+                            setValue={setPayload}
+                            type={'fullname'}
+                        />
+                        {invalidfield.fullname && <p style={{ color: 'red' }}>{invalidfield.fullname}</p>}
+                        <InputForm
+                            setInvalidfield={setInvalidfield}
                             text="Tên đăng nhập"
                             type={'name'}
                             dropShadow="focus:drop-shadow-blue"
@@ -121,16 +131,6 @@ const Login = () => {
                         <p className="text-[#5392f9] ease-in-out duration-100 hover:text-[#e12d2d] cursor-pointer">
                             <Link to="/register">
                                 <span
-                                    onClick={() => {
-                                        setPayload({
-                                            phone: '',
-                                            pass: '',
-                                            name: '',
-                                            address: '',
-                                            email: '',
-                                            repass: '',
-                                        });
-                                    }}
                                 >
                                     Đăng nhập
                                 </span>

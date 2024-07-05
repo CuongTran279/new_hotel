@@ -6,13 +6,9 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 
 const Register = () => {
-      const [payload, setPayload] = useState({
-        email: '',
+    const [payload, setPayload] = useState({
         name: '',
         pass: '',
-        phone: '',
-        address: '',
-        repass: '',
     });
     const navigate = useNavigate();
     const [invalidfield, setInvalidfield] = useState([]);
@@ -21,8 +17,8 @@ const Register = () => {
         const validatiton = validate(payload);
         setInvalidfield(validatiton);
         console.log(invalidfield.name);
-        const { repass,email,phone,address, ...payloadLogin } = payload;
-        if (payload.name !== "" && payload.pass !== "") {
+        const { repass, email, phone, address, ...payloadLogin } = payload;
+        if (payload.name !== '' && payload.pass !== '') {
             axios
                 .post('http://localhost:5000/signIn', payloadLogin)
                 .then((res) => {
@@ -30,14 +26,15 @@ const Register = () => {
                         Swal.fire({
                             title: 'Bạn đã đăng nhập thành công',
                             icon: 'success',
-                        }).then(()=>{
-                          localStorage.setItem('authToken',JSON.stringify(res.data.data));
-                          localStorage.setItem('role',JSON.stringify(res.data.data.role));
-                        }).then(()=>{
-                          navigate('/');
-                          window.location.reload();
-                        });
-                        
+                        })
+                            .then(() => {
+                                localStorage.setItem('authToken', JSON.stringify(res.data.data));
+                                localStorage.setItem('role', JSON.stringify(res.data.data.role));
+                            })
+                            .then(() => {
+                                navigate('/');
+                                window.location.reload();
+                            });
                     } else {
                         Swal.fire({
                             title: 'Không tồn tại tài khoản này',
@@ -95,16 +92,7 @@ const Register = () => {
                     <div className="mt-5 flex flex-row justify-between">
                         <p className="text-[#5392f9] ease-in-out duration-100 hover:text-[#e12d2d] cursor-pointer">
                             <Link to="/login">
-                                <span
-                                    onClick={() => {
-                                        setPayload({
-                                            pass: '',
-                                            name: '',
-                                        });
-                                    }}
-                                >
-                                    Đăng ký
-                                </span>
+                                <span>Đăng ký</span>
                             </Link>
                         </p>
                         <p className="text-[#5392f9] ease-in-out duration-100 hover:text-[#e12d2d] cursor-pointer">

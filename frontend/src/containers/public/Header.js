@@ -35,7 +35,7 @@ const Header = () => {
                 {users ? (
                     <div className="flex items-center gap-5 flex-row">
                         <p>
-                            Xin chào : <span className="uppercase">{users.name}</span>
+                            Xin chào : <span className="uppercase">{users.fullName}</span>
                         </p>
                         <Button
                             text="Đăng xuất"

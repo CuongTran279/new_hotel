@@ -34,6 +34,7 @@ const ListHotel = () => {
                         name,
                         address,
                         phone,
+                        des,
                         roomTypeId,
                         roomTypeName,
                         roomDescription,
@@ -49,6 +50,7 @@ const ListHotel = () => {
                             name,
                             address,
                             phone,
+                            des,
                             rooms: [],
                         });
                     }
@@ -112,7 +114,10 @@ const ListHotel = () => {
                                             Address
                                         </th>
                                         <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">
-                                            phone
+                                            Phone
+                                        </th>
+                                        <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center w-60">
+                                            Description
                                         </th>
                                         <th className=" py-3 px-4 uppercase font-semibold text-sm  text-center justify-center">
                                             Room
@@ -132,6 +137,7 @@ const ListHotel = () => {
                                                     <td className=" py-3 px-4">{hotel.name}</td>
                                                     <td className=" py-3 px-4">{hotel.address}</td>
                                                     <td className=" py-3 px-4">{hotel.phone}</td>
+                                                    <td className=" py-3 px-4">{hotel.des}</td>
                                                     <td className=" py-3 px-4 grid grid-rows text-left w-[500px]">
                                                         {hotel.rooms.map((room, key) => (
                                                             <div key={key} className="border-b mb-5">
@@ -148,7 +154,6 @@ const ListHotel = () => {
                                                                 <p>Price: {room.price}</p>
                                                                 <p>Capacity: {room.capacity}</p>
                                                                 <p>Quantity: {room.quantity}</p>
-                                                                
                                                             </div>
                                                         ))}
                                                     </td>

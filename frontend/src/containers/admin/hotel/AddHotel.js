@@ -8,9 +8,11 @@ const AddHotel = () => {
         name: '',
         address: '',
         phone: '',
+        des: ''
     });
     const navigate = useNavigate();
     const [selectedOptions, setSelectedOptions] = useState([]);
+    const [selectedOption, setSelectedOption] = useState('');
     const [invalidfield, setInvalidfield] = useState([]);
     const [formData, setFormData] = useState({});
     const [options, setOptions] = useState([]);
@@ -18,9 +20,14 @@ const AddHotel = () => {
         const { name } = e.target;
         setInvalidfield({ ...invalidfield, [name]: undefined });
     };
-    // const handleOptionChange = (e) => {
-    //     setSelectedOptions(e.target.value);
-    // };
+    const option = [
+        { value: 'Hà Nội', label: 'Hà Nội' },
+        { value: 'Nam Định', label: 'Nam Định' },
+        { value: 'Hạ Long', label: 'Hạ Long' },
+    ];
+    const handleChange = (event) => {
+        setSelectedOption(event.target.value);
+    };
     const setValue = (e) => {
         const { name, value } = e.target;
         setPayload({ ...payload, [name]: value });
@@ -28,6 +35,7 @@ const AddHotel = () => {
     const validate = () => {
         let err = {};
         if (!payload.name) err.name = 'Không được để trống';
+        if (!payload.des) err.des = 'Không được để trống';
         if (!payload.phone) {
             err.phone = 'Số điện thoại không được để trống.';
         } else if (!payload.phone.match(/^\d+$/)) {
@@ -37,7 +45,6 @@ const AddHotel = () => {
         } else if (!payload.phone.match(/^0[0-9]{9}$/)) {
             err.phone = 'Số điện thoại phải bắt đầu từ số 0';
         }
-        if (!payload.address) err.address = 'Không được để trống';
         setInvalidfield(err);
         return Object.keys(err).length === 0;
     };
@@ -60,8 +67,9 @@ const AddHotel = () => {
         if (validate()) {
             const formData = new FormData();
             formData.append('name', payload.name);
-            formData.append('address', payload.address);
+            formData.append('address', selectedOption);
             formData.append('phone', payload.phone);
+            formData.append('des', payload.des);
             formData.append('options', selectedOptions);
             const formObject = Object.fromEntries(formData.entries());
             setFormData(formObject);
@@ -113,14 +121,16 @@ const AddHotel = () => {
                             </div>
                             <div className="mt-2">
                                 <label className="block text-sm text-gray-600">Địa chỉ</label>
-                                <input
-                                    value={payload.address}
-                                    className="w-full px-5  py-4 text-gray-700 bg-gray-200 rounded outline-none"
-                                    name="address"
-                                    onChange={setValue}
-                                    onFocus={setInvalid}
-                                />
-                                {invalidfield.address && <p className="text-red-600 italic">{invalidfield.address}</p>}
+                                <select value={selectedOption} onChange={handleChange}>
+                                    <option value="" disabled>
+                                        Select an option
+                                    </option>
+                                    {option.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="mt-2">
                                 <label className="block text-sm text-gray-600">Số điện thoại</label>
@@ -134,11 +144,27 @@ const AddHotel = () => {
                                 {invalidfield.phone && <p className="text-red-600 italic">{invalidfield.phone}</p>}
                             </div>
                             <div className="mt-2">
+                                <label className="block text-sm text-gray-600">Mô tả</label>
+                                <textarea
+                                    value={payload.des}
+                                    className="w-full px-5  py-4 text-gray-700 bg-gray-200 rounded outline-none"
+                                    name="des"
+                                    onChange={setValue}
+                                    onFocus={setInvalid}
+                                />
+                                {invalidfield.des && <p className="text-red-600 italic">{invalidfield.des}</p>}
+                            </div>
+                            <div className="mt-2">
                                 <label className="block text-sm text-gray-600">Các loại phòng</label>
                                 <div className="flex flex-col gap-10">
                                     {options.map((option) => (
                                         <label key={option.id}>
-                                            <input type="checkbox" value={option.id} onChange={handleOptionChange} checked={selectedOptions.includes(option.id.toString())}/>
+                                            <input
+                                                type="checkbox"
+                                                value={option.id}
+                                                onChange={handleOptionChange}
+                                                checked={selectedOptions.includes(option.id.toString())}
+                                            />
                                             {option.name}
                                         </label>
                                     ))}

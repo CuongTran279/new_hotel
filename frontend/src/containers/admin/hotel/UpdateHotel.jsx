@@ -12,13 +12,13 @@ const UpdateHotel = () => {
             .get('http://localhost:5000/getHotel/' + id)
             .then((res) => {
                 const hotelMap = new Map();
-
                 res.data.forEach((hotel) => {
                     const {
                         id,
                         name,
                         address,
                         phone,
+                        des,
                         roomTypeId,
                         roomTypeName,
                         roomDescription,
@@ -34,6 +34,7 @@ const UpdateHotel = () => {
                             name,
                             address,
                             phone,
+                            des,
                             rooms: [],
                         });
                     }
@@ -108,7 +109,7 @@ const UpdateHotel = () => {
                 Swal.fire({
                     title: 'Sửa thành công',
                     icon: 'success',
-                })
+                });
             })
             .catch((error) => {
                 console.error('There was an error updating the room quantity!', error);
@@ -160,6 +161,14 @@ const UpdateHotel = () => {
                                         />
                                     </div>
                                     <div className="mt-2">
+                                        <label className="block text-sm text-gray-600">Des</label>
+                                        <textarea
+                                            value={hotel.des}
+                                            className="w-full px-5  py-4 text-gray-700 bg-gray-200 rounded outline-none"
+                                            name="phone"
+                                        />
+                                    </div>
+                                    <div className="mt-2">
                                         <label className="block text-sm text-gray-600">Rooms - {hotel.roomCount}</label>
                                         <div className="mt-2">
                                             {hotel.rooms.map((room, key) => (
@@ -206,14 +215,6 @@ const UpdateHotel = () => {
                         ) : (
                             <p>No data available</p>
                         )}
-                        {/* <div className="mt-5">
-                                <button
-                                    className="font-semibold uppercase p-2 bg-[#1947ee] text-white rounded-xl hover:bg-[#3d68ff]"
-                                    type="submit"
-                                >
-                                    Sửa
-                                </button>
-                            </div> */}
                     </div>
                 </main>
             </div>

@@ -47,8 +47,8 @@ app.get('/', (req, res) => {
 });
 
 app.post('/signUp', (req, res) => {
-    const sql = 'INSERT INTO users(email, name, pass, phone, address) VALUES (?)';
-    const values = [req.body.email, req.body.name, req.body.pass, req.body.phone, req.body.address];
+    const sql = 'INSERT INTO users(email, name, pass, phone, address,fullName) VALUES (?)';
+    const values = [req.body.email, req.body.name, req.body.pass, req.body.phone, req.body.address, req.body.fullname];
     connect.query(sql, [values], (err, result) => {
         if (err) {
             return res.json({ err: err.message });
@@ -199,8 +199,8 @@ app.delete('/deleteRoomType/:id', (req, res) => {
 });
 
 app.post('/addHotel', (req, res) => {
-    const roomSql = 'INSERT INTO hotel(name, address, phone) VALUES (?,?,?)';
-    connect.query(roomSql, [req.body.name, req.body.address, req.body.phone], (err, result) => {
+    const roomSql = 'INSERT INTO hotel(name, address,des, phone) VALUES (?,>,?,?)';
+    connect.query(roomSql, [req.body.name, req.body.address, req.body.des, req.body.phone], (err, result) => {
         if (err) {
             console.error('Lỗi insert hotel : ', err);
             return res.status(500).send('Internal server error');
@@ -220,7 +220,7 @@ app.post('/addHotel', (req, res) => {
 
 app.get('/hotel', (req, res) => {
     const sql =
-        "SELECT hotel.id, hotel.name, hotel.address, hotel.phone, room.quantity as roomQuantity, roomType.id as roomTypeId, roomType.name as roomTypeName, roomType.des as roomDescription, roomType.price as roomPrice, roomType.capicity as roomCapacity, GROUP_CONCAT(img.path SEPARATOR '|') as roomImages FROM hotel INNER JOIN room ON room.hotelId = hotel.id INNER JOIN roomType ON room.roomId = roomType.id INNER JOIN img ON img.roomId = roomType.id GROUP BY hotel.id, hotel.name, hotel.address, hotel.phone, roomType.id, roomType.name, roomType.des, roomType.price, roomType.capicity, room.quantity";
+        "SELECT hotel.id, hotel.name, hotel.address,hotel.des, hotel.phone, room.quantity as roomQuantity, roomType.id as roomTypeId, roomType.name as roomTypeName, roomType.des as roomDescription, roomType.price as roomPrice, roomType.capicity as roomCapacity, GROUP_CONCAT(img.path SEPARATOR '|') as roomImages FROM hotel INNER JOIN room ON room.hotelId = hotel.id INNER JOIN roomType ON room.roomId = roomType.id INNER JOIN img ON img.roomId = roomType.id GROUP BY hotel.id, hotel.name, hotel.address, hotel.phone,hotel.des, roomType.id, roomType.name, roomType.des, roomType.price, roomType.capicity, room.quantity";
     connect.query(sql, (err, result) => {
         if (err) {
             return res.json({ msg: 'Lỗi' });
@@ -270,7 +270,7 @@ app.delete('/deleteHotel/:id', (req, res) => {
 app.get('/getHotel/:id', (req, res) => {
     const id = req.params.id;
     const sql =
-        "SELECT hotel.id, hotel.name, hotel.address, hotel.phone, room.quantity as roomQuantity, roomType.id as roomTypeId, roomType.name as roomTypeName, roomType.des as roomDescription, roomType.price as roomPrice, roomType.capicity as roomCapacity, GROUP_CONCAT(img.path SEPARATOR '|') as roomImages FROM hotel INNER JOIN room ON room.hotelId = hotel.id INNER JOIN roomType ON room.roomId = roomType.id INNER JOIN img ON img.roomId = roomType.id WHERE hotel.id = ? GROUP BY hotel.id, hotel.name, hotel.address, hotel.phone, roomType.id, roomType.name, roomType.des, roomType.price, roomType.capicity, room.quantity";
+        "SELECT hotel.id, hotel.name,hotel.des, hotel.address, hotel.phone, room.quantity as roomQuantity, roomType.id as roomTypeId, roomType.name as roomTypeName, roomType.des as roomDescription, roomType.price as roomPrice, roomType.capicity as roomCapacity, GROUP_CONCAT(img.path SEPARATOR '|') as roomImages FROM hotel INNER JOIN room ON room.hotelId = hotel.id INNER JOIN roomType ON room.roomId = roomType.id INNER JOIN img ON img.roomId = roomType.id WHERE hotel.id = ? GROUP BY hotel.id, hotel.name, hotel.des , hotel.address, hotel.phone, roomType.id, roomType.name, roomType.des, roomType.price, roomType.capicity, room.quantity";
     connect.query(sql, [id], (err, result) => {
         if (err) {
             return res.json({ msg: 'Lỗi' });
